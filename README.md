@@ -12,10 +12,6 @@ timeout: 2
 debug: false
 ```
 
-**Deploy the Single Node Cluster:** `curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --service-cidr 10.43.0.0/16 --cluster-cidr 10.44.0.0/16 --disable traefik,metrics-server,local-storage --disable-helm-controller --write-kubeconfig-mode 644 sh" sh -`
-
-**Deploy Local Storage** `kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.32/deploy/local-path-storage.yaml`
-
 **Mount Storage to Default Location on Different Disk**:
 - Create a systemd-mount file: `opt-local\\x2dpath\\x2dprovisioner.mount`
 ```
@@ -32,6 +28,11 @@ Options=defaults
 WantedBy=multi-user.target
 ```
 - `systemctl enable --now opt-local\\x2dpath\\x2dprovisioner.mount`
+
+
+**Deploy the Single Node Cluster:** `curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --service-cidr 10.43.0.0/16 --cluster-cidr 10.44.0.0/16 --disable traefik,metrics-server,local-storage --disable-helm-controller --write-kubeconfig-mode 644 sh" sh -`
+
+**Deploy Local Storage** `kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.32/deploy/local-path-storage.yaml`
 
 **Location of Default Kube Config**: `/etc/rancher/k3s/k3s.yaml`
 
