@@ -40,13 +40,13 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nginx-web-ingress
+  name: nginx-k3s-web-ingress
   namespace: default
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-    - host: nginx.workshop.example.com
+    - host: nginx.k3s.noelmiller.dev
       http:
         paths:
           - path: /
@@ -58,5 +58,29 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - nginx.workshop.example.com
-      secretName: default-workshop-example-tls
+        - nginx.k3s.noelmiller.dev
+      secretName: default-k3s-wildcard-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-web-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: nginx.noelmiller.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-web-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - nginx.noelmiller.dev
+      secretName: default-wildcard-tls

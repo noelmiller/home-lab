@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: default-k3s-wildcard-cert
+  namespace: default
+spec:
+  secretName: default-k3s-wildcard-tls
+  issuerRef:
+    name: letsencrypt-dns01-issuer
+    kind: ClusterIssuer
+  commonName: k3s.noelmiller.dev
+  dnsNames:
+    - k3s.noelmiller.dev
+    - "*.k3s.noelmiller.dev"
