@@ -1,19 +1,19 @@
-# Notes
+# Home Lab
+
+## What is this?
+
+This documents the scripts I use to deploy a single node K3S cluster in my home lab.
 
 ## Manual Commands
 
-I am going through the motions of doing everything by hand before I make an attempt to automate the installation.
+The default location is `/opt/local-path-provisioner`
 
-**Copy crictl.yaml**: `cp crictl.yaml /etc/crictl.yaml`
-```
-runtime-endpoint: unix:///var/run/containerd/containerd.sock
-image-endpoint: unix:///var/run/containerd/containerd.sock
-timeout: 2
-debug: false
-```
+This will put all of the storage you use on the disk that you have root on. In my case, I want to mount a larger disk to that location for my volumes.
 
 **Mount Storage to Default Location on Different Disk**:
+
 - Create a systemd-mount file: `opt-local\\x2dpath\\x2dprovisioner.mount`
+
 ```
 [Unit]
 Description=Mount K3S Data LV
@@ -27,26 +27,21 @@ Options=defaults
 [Install]
 WantedBy=multi-user.target
 ```
+
 - `systemctl enable --now opt-local\\x2dpath\\x2dprovisioner.mount`
 
+**IMPORANT: The storage should be configured before you move on to the automated scripts**
 
-**Deploy the Single Node Cluster:** `curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --service-cidr 10.43.0.0/16 --cluster-cidr 10.44.0.0/16 --disable traefik,metrics-server,local-storage --disable-helm-controller --write-kubeconfig-mode 644 sh" sh -`
+## Automated Script
 
-**Deploy Local Storage** `kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.32/deploy/local-path-storage.yaml`
+First, pull down the git repo onto the node you want to install k3s on.
 
-**Location of Default Kube Config**: `/etc/rancher/k3s/k3s.yaml`
+Next, cd into the directory and run `cd cluster-system && ./prepare-cluster.sh`
 
-**Install Kubernetes Dashboard**:
+After you have done the prep work, just run `./cluster-setup.sh`
 
-```
-helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
-```
+It will ask for an email address and an API token for Cloudflare. You will need to add permissions to your domain in order to allow the challenge to work.
 
-**Access Dashboard:**
+<https://cert-manager.io/docs/configuration/acme/dns01/cloudflare/>
 
-```
-kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
-Dashboard will be available at:
-  https://localhost:8443
-```
+Everything should complete successfully and now it's time to enjoy the cluster!
