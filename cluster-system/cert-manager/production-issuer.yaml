@@ -7,7 +7,7 @@ spec:
     server: https://acme-v02.api.letsencrypt.org/directory
     email: <YOUR_EMAIL_HERE> # your email address for updates
     privateKeySecretRef:
-      name: letsencrypt-test-dns01-private-key
+      name: letsencrypt-dns01-private-key
     solvers:
       - dns01:
           cloudflare:
