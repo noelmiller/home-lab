@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: default-workshop-certificate
+  namespace: default
+spec:
+  secretName: default-workshop-example-tls
+  issuerRef:
+    name: letsencrypt-dns01-issuer
+    kind: ClusterIssuer
+  commonName: workshop.example.com
+  dnsNames:
+    - workshop.example.com
+    - "*.workshop.example.com"
