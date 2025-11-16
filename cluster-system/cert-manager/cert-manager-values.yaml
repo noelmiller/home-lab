@@ -1,7 +1,11 @@
-installCRDs: true
+crds:
+  enabled: true
 
 prometheus:
   enabled: false
+
+config:
+  enableGatewayAPI: true
 
 extraArgs:
   - --cluster-resource-namespace=cluster-system
