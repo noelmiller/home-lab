@@ -37,50 +37,83 @@ spec:
   selector:
     app: nginx-web
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
 metadata:
-  name: nginx-k3s-web-ingress
+  name: nginx-gw
   namespace: default
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
 spec:
-  rules:
-    - host: nginx.k3s.noelmiller.dev
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: nginx-web-service
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - nginx.k3s.noelmiller.dev
-      secretName: default-k3s-wildcard-tls
+  gatewayClassName: nginx
+  listeners:
+    - hostname: nginx.k3s.noelmiller.dev
+      name: nginx-k3s-noelmiller-dev-http
+      port: 80
+      protocol: HTTP
+    - hostname: nginx.k3s.noelmiller.dev
+      name: nginx-k3s-noelmiller-dev-https
+      port: 443
+      protocol: HTTPS
+      tls:
+        certificateRefs:
+          - group: null
+            kind: null
+            name: default-k3s-wildcard-tls
+    - hostname: nginx.noelmiller.dev
+      name: nginx-noelmiller-dev-http
+      port: 80
+      protocol: HTTP
+    - hostname: nginx.noelmiller.dev
+      name: nginx-noelmiller-dev-https
+      port: 443
+      protocol: HTTPS
+      tls:
+        certificateRefs:
+          - group: null
+            kind: null
+            name: default-wildcard-tls
+status: {}
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: nginx-web-ingress
-  namespace: default
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    gateway.networking.k8s.io/generator: ingress2gateway-0.4.0
+  name: nginx-gw-route-nginx-k3s-noelmiller-dev
+  namespace: default
 spec:
+  hostnames:
+    - nginx.k3s.noelmiller.dev
+  parentRefs:
+    - name: nginx-gw
   rules:
-    - host: nginx.noelmiller.dev
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: nginx-web-service
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - nginx.noelmiller.dev
-      secretName: default-wildcard-tls
+    - backendRefs:
+        - name: nginx-web-service
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+status:
+  parents: []
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  creationTimestamp: null
+  name: nginx-gw-route-nginx-noelmiller-dev
+  namespace: default
+spec:
+  hostnames:
+    - nginx.noelmiller.dev
+  parentRefs:
+    - name: nginx-gw
+  rules:
+    - backendRefs:
+        - name: nginx-web-service
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+status:
+  parents: []
