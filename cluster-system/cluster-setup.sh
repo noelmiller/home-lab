@@ -13,7 +13,7 @@ metrics-server/install.sh
 cert-manager/install.sh
 
 ## 5. Install ingress-nginx
-ingress-nginx/install.sh
+nginx-gateway-fabric/install.sh
 
 ## May add in the future..
 ## 6. Install kubernetes dashboard
