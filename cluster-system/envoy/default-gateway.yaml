@@ -1,0 +1,44 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: default-gateway
+  namespace: cluster-system
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: "10.42.0.11"
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http-universal
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+
+    # --- HTTPS Listener 1 (k3s subdomain) ---
+    - name: https-k3s
+      hostname: "*.apps.k3s.noelmiller.dev"
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: default-apps-k3s-wildcard-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+
+    # --- HTTPS Listener 2 (Root wildcard) ---
+    - name: https-root
+      hostname: "*.noelmiller.dev"
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: default-wildcard-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All

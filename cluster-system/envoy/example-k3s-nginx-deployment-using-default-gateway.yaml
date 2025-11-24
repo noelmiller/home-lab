@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-web
+  namespace: default
+  labels:
+    app: nginx-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-web
+  template:
+    metadata:
+      labels:
+        app: nginx-web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.19
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-web-service
+  namespace: default
+  labels:
+    app: nginx-web
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: nginx-web
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  creationTimestamp: null
+  name: default-gateway-route-nginx-noelmiller-dev
+  namespace: default
+spec:
+  hostnames:
+    - nginx.noelmiller.dev
+  parentRefs:
+    - name: default-gateway
+      namespace: cluster-system
+      sectionName: https-root
+  rules:
+    - backendRefs:
+        - name: nginx-web-service
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  creationTimestamp: null
+  name: default-gateway-route-nginx-apps-k3s-noelmiller-dev
+  namespace: default
+spec:
+  hostnames:
+    - nginx.apps.k3s.noelmiller.dev
+  parentRefs:
+    - name: default-gateway
+      namespace: cluster-system
+      sectionName: https-k3s
+  rules:
+    - backendRefs:
+        - name: nginx-web-service
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
