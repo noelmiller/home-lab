@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  creationTimestamp: null
+  name: jellyfin-route
+  namespace: media-services
+spec:
+  hostnames:
+    - jellyfin.apps.k3s.noelmiller.dev
+  parentRefs:
+    - name: default-gateway
+      namespace: cluster-system
+      sectionName: https-k3s
+  rules:
+    - backendRefs:
+        - name: jellyfin
+          port: 8096
+      matches:
+        - path:
+            type: PathPrefix
+            value: /

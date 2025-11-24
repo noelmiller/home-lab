@@ -1,0 +1,15 @@
+nodeSelector:
+  kubernetes.io/hostname: k3s.noelmiller.dev
+
+persistence:
+  config:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    storageClass: "local-path"
+  media:
+    enabled: true
+    type: pvc
+    accessMode: ReadWriteOnce
+    size: 10Ti
+    storageClass: "nas-storage"
