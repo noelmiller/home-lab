@@ -1,0 +1,24 @@
+persistence:
+  homarrDatabase:
+    enabled: true
+    storageClassName: "local-path"
+    size: "1Gi"
+
+service:
+  enabled: true # must be enabled for HTTPRoute to forward traffic
+httproute:
+  enabled: true
+  parentRefs:
+    - name: default-gateway
+      namespace: cluster-system
+      sectionName: https-k3s
+  hostnames:
+    - dashboard.apps.k3s.noelmiller.dev
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: homarr
+          port: 7575
