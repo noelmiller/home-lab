@@ -12,8 +12,11 @@ metrics-server/install.sh
 ## 4. Install jetstack cert-manager, cloudflare dns01
 cert-manager/install.sh
 
-## 5. Install ingress-nginx
-nginx-gateway-fabric/install.sh
+## 5. Install envoy
+envoy/install.sh
+
+## 6. Install metallb
+metallb/install.sh
 
 ## May add in the future..
 ## 6. Install kubernetes dashboard
