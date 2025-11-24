@@ -1,0 +1,53 @@
+# --- 1. Handle the Web UI (Replaces Ingress) ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: unifi-web
+  namespace: unifi
+spec:
+  parentRefs:
+    - name: unifi-gateway-v2
+  hostnames:
+    - "unifi.noelmiller.dev"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: gateway.envoyproxy.io
+          kind: Backend
+          name: unifi-backend
+          port: 8443
+
+---
+# --- 2. Handle Device Adoption (TCP 8080) ---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: unifi-inform
+  namespace: unifi
+spec:
+  parentRefs:
+    - name: unifi-gateway-v2
+      sectionName: inform # Matches listener name
+  rules:
+    - backendRefs:
+        - name: unifi
+          port: 8080
+
+---
+# --- 3. Handle STUN (UDP 3478) ---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: UDPRoute
+metadata:
+  name: unifi-stun
+  namespace: unifi
+spec:
+  parentRefs:
+    - name: unifi-gateway-v2
+      sectionName: stun
+  rules:
+    - backendRefs:
+        - name: unifi
+          port: 3478

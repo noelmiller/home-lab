@@ -1,0 +1,15 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: unifi-backend
+  namespace: unifi
+spec:
+  # This section defines the Upstream (UniFi)
+  endpoints:
+    - fqdn:
+        hostname: unifi.unifi.svc.cluster.local
+        port: 8443
+
+  # This section disables the certificate check
+  tls:
+    insecureSkipVerify: true

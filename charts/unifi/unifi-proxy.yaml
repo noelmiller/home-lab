@@ -1,0 +1,14 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: unifi-proxy-config
+  namespace: unifi
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: LoadBalancer
+        # This injects the annotation directly onto the generated Service
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: "10.42.0.16"

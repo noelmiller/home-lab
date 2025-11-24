@@ -1,0 +1,42 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: unifi-gateway-v2
+  namespace: unifi # Assuming you install unifi here
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-dns01-issuer"
+    gateway.envoyproxy.io/envoy-proxy-name: unifi-proxy-config
+spec:
+  gatewayClassName: eg
+  listeners:
+    # 1. Web UI (HTTPS)
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: "unifi.noelmiller.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: unifi-cert-tls
+
+    # 2. Web UI (HTTP Redirect)
+    - name: http
+      port: 80
+      protocol: HTTP
+      hostname: "unifi.noelmiller.dev"
+
+    # 3. Device Adoption (TCP 8080)
+    - name: inform
+      port: 8080
+      protocol: TCP
+      allowedRoutes:
+        kinds:
+          - kind: TCPRoute
+
+    # 4. STUN (UDP 3478)
+    - name: stun
+      port: 3478
+      protocol: UDP
+      allowedRoutes:
+        kinds:
+          - kind: UDPRoute

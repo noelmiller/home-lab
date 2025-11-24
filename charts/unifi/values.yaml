@@ -1,0 +1,52 @@
+# -----------------------------------------------------------------
+# UniFi Controller - Minimal Overrides for Envoy Gateway + MetalLB
+# -----------------------------------------------------------------
+
+timezone: "America/Chicago"
+
+# 1. UNIFIED SERVICE
+# We enable this to get a SINGLE LoadBalancer IP that handles 
+# Device Traffic (8080/3478/10001) AND Web UI (8443)
+unifiedService:
+  enabled: true
+  type: ClusterIP
+
+# 2. DISABLE INDIVIDUAL SERVICES
+# We disable these because 'unifiedService' handles all of them now.
+guiService:
+  enabled: false
+controllerService:
+  enabled: false
+stunService:
+  enabled: false
+discoveryService:
+  enabled: false
+syslogService:
+  enabled: false
+captivePortalService:
+  enabled: false
+
+# 3. INGRESS (WEB UI)
+# This is handled by the Envoy Gateway, no need for the ingress controller
+ingress:
+  enabled: false
+
+# 4. PERSISTENCE
+# Save data across restarts
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: "local-path"
+
+# 5. RESOURCES
+# Basic limits to ensure it doesn't eat the whole node
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1024Mi"
+
+env:
+  # Force UniFi GUI to listen on HTTP port 8080
+  UNIFI_HTTP_PORT: "8080"
