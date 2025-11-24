@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nas-static-pv
+spec:
+  capacity:
+    storage: 10Ti # This is just a label! It doesn't resize your NAS.
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nas-storage
+  nfs:
+    server: nas01.henrymillerfrazier.lan
+    path: /volume1/data
